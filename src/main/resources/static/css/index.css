@@ -1,0 +1,29 @@
+* {
+    font-size: 105%;
+    scroll-behavior: smooth;
+}
+
+a {
+    color: black !important;
+    text-decoration: none !important;
+}
+
+.content {
+    min-height: 760px;
+}
+
+.error {
+    color: #dc3545;
+    font-weight: bolder;
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    display: none;
+}
+
+.selected {
+    background-color: #f67c01 !important;
+}
