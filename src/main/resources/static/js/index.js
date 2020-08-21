@@ -136,6 +136,7 @@ function taskDelete(id) {
                     displayLstPage(data);
                     document.getElementById('button-page-'+currentPage).classList.add("selected");
                     document.getElementById('current-page').value = currentPage;
+                    console.log(currentPage);
                     $.ajax({
                             url: '/tasks?page=' + currentPage,
                             type: "GET",
@@ -174,16 +175,16 @@ function serverValidate() {
 
 }
 
-function page(page) {
+function page(pageindex) {
     var totalPage = document.getElementById('total-page').value;
 
-    if(parseInt(page) === 1) {
+    if(parseInt(pageindex) === 1) {
         document.getElementById('button-page-prev').style.display = 'none';
     } else {
         document.getElementById('button-page-prev').style.display = 'block';
     }
 
-    if(parseInt(totalPage) === parseInt(page)) {
+    if(parseInt(totalPage) === parseInt(pageindex)) {
         document.getElementById('button-page-next').style.display = 'none';
     } else {
         document.getElementById('button-page-next').style.display = 'block';
@@ -192,17 +193,17 @@ function page(page) {
     var currentPage = document.getElementById('current-page').value;
     document.getElementById('button-page-' + currentPage).classList.remove("selected");
     $.ajax({
-        url: 'page?pageInput=' + page,
+        url: 'page?pageInput=' + pageindex,
         type: "GET",
         success: function (data) {
             for(var i = 1; i <= parseInt(totalPage); i++) {
                 $('#button-page-'+i).remove();
             }
             displayLstPage(data);
-            document.getElementById('button-page-'+page).classList.add("selected");
-            document.getElementById('current-page').value = page;
+            document.getElementById('button-page-'+pageindex).classList.add("selected");
+            document.getElementById('current-page').value = pageindex;
             $.ajax({
-                    url: '/tasks?page='+page,
+                    url: '/tasks?page='+pageindex,
                     type: "GET",
                     success: function (data) {
                         dataDisplay(data)
@@ -235,11 +236,37 @@ function nextButton() {
     if(totalPage === nextPage) {
         lastButton();
     } else {
-        page(nextPage);
+        $.ajax({
+            url: 'page?pageInput=' + nextPage,
+            type: "GET",
+            success: function (data) {
+                if(data.length === 0) {
+                    var x = nextPage - 1;
+                    document.getElementById('total-page').value = x;
+                    console.log(x);
+                    page(x);
+                } else {
+                    page(nextPage);
+                }
+            }
+        })
     }
 }
 
 function lastButton() {
     var totalPage = document.getElementById('total-page').value;
-    page(totalPage);
+    $.ajax({
+        url: 'page?pageInput=' + totalPage,
+        type: "GET",
+        success: function (data) {
+            if(data.length === 0) {
+                var x = parseInt(totalPage) - 1;
+                document.getElementById('total-page').value = x;
+                console.log(x);
+                page(x);
+            } else {
+                page(totalPage);
+            }
+        }
+    })
 }
