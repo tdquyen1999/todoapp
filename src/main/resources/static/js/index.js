@@ -1,3 +1,49 @@
+$(document).ready(function () {
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 50) {
+            $('#back-to-top').fadeIn();
+        } else {
+            $('#back-to-top').fadeOut();
+        }
+    });
+    // scroll body to 0px on click
+    $('#back-to-top').click(function () {
+        $('body,html').animate({
+            scrollTop: 0
+        }, 400);
+        return false;
+    });
+});
+
+$(document).ready(function () {
+    var currentPage = document.getElementById('current-page').value;
+    $.ajax({
+        url: 'page?pageInput=' + currentPage,
+        type: "GET",
+        success: function (data) {
+            displayLstPage(data);
+            document.getElementById('button-page-prev').style.display = 'none';
+            document.getElementById('button-page-1').classList.add("selected");
+            $.ajax({
+                    url: '/tasks',
+                    type: "GET",
+                    success: function (data) {
+                        dataDisplay(data);
+                    }
+                }
+            )
+        }
+    })
+});
+
+document.addEventListener('keydown', function (event) {
+    if(event.which === 39) {
+        nextButton();
+    } else if(event.which === 37) {
+        previousButton();
+    }
+})
+
 function addAndEdit(taskID, action) {
     var x = parseInt(taskID)
     document.getElementById('formaddedit').style.display = 'flex'
@@ -19,31 +65,6 @@ function addAndEdit(taskID, action) {
         })
     }
 }
-
-$(document).ready(function () {
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 50) {
-            $('#back-to-top').fadeIn();
-        } else {
-            $('#back-to-top').fadeOut();
-        }
-    });
-    // scroll body to 0px on click
-    $('#back-to-top').click(function () {
-        $('body,html').animate({
-            scrollTop: 0
-        }, 400);
-        return false;
-    });
-});
-
-document.addEventListener('keydown', function (event) {
-    if(event.which === 39) {
-        nextButton();
-    } else if(event.which === 37) {
-        previousButton();
-    }
-})
 
 function dataDisplay(data) {
     $('#tableBody').html("");
@@ -78,28 +99,6 @@ function displayLstPage(data) {
         $('#page-item-number').append("<button class=\"btn btn-outline-dark rounded mr-2\" onclick=page(" + element + ") id=\"button-page-" + element + "\"><a href=\"#\" class=\"justify-content-center\">" + element + "</a></button>")
     }
 }
-
-$(document).ready(function () {
-    var currentPage = document.getElementById('current-page').value;
-    $.ajax({
-        url: 'page?pageInput=' + currentPage,
-        type: "GET",
-        success: function (data) {
-            displayLstPage(data);
-            document.getElementById('button-page-prev').style.display = 'none';
-            document.getElementById('button-page-1').classList.add("selected");
-            $.ajax({
-                    url: '/tasks',
-                    type: "GET",
-                    success: function (data) {
-                        dataDisplay(data);
-                    }
-                }
-            )
-        }
-    })
-});
-
 
 function taskPassed(id) {
     console.log(id);
@@ -226,7 +225,7 @@ function firstButton() {
 
 function previousButton() {
     var prePage = parseInt(document.getElementById('current-page').value) - 1;
-    if (prePage === 1) {
+    if (prePage === 1 || prePage <= 0) {
         firstButton();
     } else {
         page(prePage);
