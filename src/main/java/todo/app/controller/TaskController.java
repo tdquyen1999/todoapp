@@ -11,12 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import todo.app.constant.Constant;
 import todo.app.entity.Task;
 import todo.app.exception.NotFoundException;
-import todo.app.handler.ErrorResponse;
 import todo.app.handler.TaskExceptionHandler;
 import todo.app.service.TaskServiceImp;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 public class TaskController implements ErrorController {
@@ -25,13 +22,13 @@ public class TaskController implements ErrorController {
     @Autowired
     TaskExceptionHandler taskExceptionHandler;
 
-    @RequestMapping("/test")
-    public void test() throws NotFoundException {
-        ArrayList<Task> tasks = taskServiceImp.taskGetAll(false);
-        if(!tasks.isEmpty()) {
-            throw new NotFoundException(Constant.NOT_FOUND_ANY_TASK);
-        }
-    }
+//    @RequestMapping("/test")
+//    public void test() throws NotFoundException {
+//        ArrayList<Task> tasks = taskServiceImp.taskGetAll(false);
+//        if(!tasks.isEmpty()) {
+//            throw new NotFoundException(Constant.NOT_FOUND_ANY_TASK);
+//        }
+//    }
 
     @RequestMapping("/home")
     public String home(Model model){

@@ -4,7 +4,7 @@ package todo.app.validation;
 import org.apache.commons.lang3.StringUtils;
 
 public class Validation {
-    public String formValidate(String stringInput) {
+    public String taskContentValidate(String stringInput) {
         if (StringUtils.isAllBlank(stringInput) || StringUtils.isEmpty(stringInput)) {
             return "EMPTY_ERROR";
         } else if (stringInput.trim().length() > 50) {

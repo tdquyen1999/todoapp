@@ -3,7 +3,6 @@ package todo.app.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import todo.app.entity.Task;
-
 import java.util.ArrayList;
 
 public interface TaskService {

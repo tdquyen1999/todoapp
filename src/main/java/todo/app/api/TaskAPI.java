@@ -2,8 +2,6 @@ package todo.app.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -14,42 +12,17 @@ import todo.app.constant.Constant;
 import todo.app.entity.Task;
 import todo.app.service.TaskServiceImp;
 import todo.app.validation.Validation;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class TaskAPI {
     @Autowired
     TaskServiceImp taskServiceImp;
 
-    public Page page(int indexPage) {
-        Pageable pageable = PageRequest.of(indexPage - 1, Constant.PAGE_SIZE);
-        Page<Task> taskPage = taskServiceImp.taskPagingAll(false, pageable);
-        return taskPage;
-    }
-
-    public List<Task> taskIndex(List<Task> tasks) {
-        Map<Integer, Task> integerTaskMap = new HashMap<>();
-        ArrayList<Task> tasks1 = taskServiceImp.taskGetAll(false);
-        for(int i = 0; i < tasks1.size(); i++) {
-            integerTaskMap.put((i + 1), tasks1.get(i));
-        }
-        for(Map.Entry<Integer, Task> entry : integerTaskMap.entrySet()) {
-            for(Task task : tasks) {
-                if(entry.getValue().getId() == task.getId()) {
-                    task.setIndex(entry.getKey());
-                }
-            }
-        }
-        return tasks;
-    }
-
     @GetMapping("/page")
     public ResponseEntity listPage(@RequestParam int pageInput) {
-        Page<Task> taskPage = page(1);
+        Page<Task> taskPage = taskServiceImp.taskGetByPage(1);
         int totalPage = taskPage.getTotalPages();
         ArrayList<Integer> listPage = new ArrayList<>();
         if (pageInput == 1 && totalPage >= 3) {
@@ -80,8 +53,8 @@ public class TaskAPI {
         } else {
             indexPage = 1;
         }
-        Page<Task> taskPage = page(indexPage);
-        List<Task> tasks = taskIndex(taskPage.getContent());
+        Page<Task> taskPage = taskServiceImp.taskGetByPage(indexPage);
+        List<Task> tasks = taskServiceImp.taskIndex(taskPage.getContent());
         return ResponseEntity.status(HttpStatus.OK).body(tasks);
     }
 
@@ -90,7 +63,7 @@ public class TaskAPI {
         Task task = new Task();
         if (id == 0) {
             Validation validation = new Validation();
-            String subjectInput = validation.formValidate(content);
+            String subjectInput = validation.taskContentValidate(content);
             if (subjectInput.equals("EMPTY_ERROR")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Constant.DATA_EMPTY);
             } else if (subjectInput.equals("LENGTH_ERROR")) {
@@ -100,9 +73,9 @@ public class TaskAPI {
                 task.setFlag(false);
                 task.setStatus(false);
                 taskServiceImp.taskCRUD(task);
-                Page<Task> page1st = page(1);
-                Page<Task> taskPage = page(page1st.getTotalPages());
-                List<Task> tasks = taskIndex(taskPage.getContent());
+                Page<Task> page1st = taskServiceImp.taskGetByPage(1);
+                Page<Task> taskPage = taskServiceImp.taskGetByPage(page1st.getTotalPages());
+                List<Task> tasks = taskServiceImp.taskIndex(taskPage.getContent());
                 return ResponseEntity.status(HttpStatus.OK).body(tasks);
             }
         } else {
@@ -115,7 +88,7 @@ public class TaskAPI {
                 task.setFlag(true);
             } else if (action.equalsIgnoreCase("create")) {
                 Validation validation = new Validation();
-                String subjectInput = validation.formValidate(content);
+                String subjectInput = validation.taskContentValidate(content);
                 if (subjectInput.equals("EMPTY_ERROR")) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Constant.DATA_EMPTY);
                 } else if (subjectInput.equals("LENGTH_ERROR")) {
@@ -126,11 +99,11 @@ public class TaskAPI {
             }
         }
         taskServiceImp.taskCRUD(task);
-        Page<Task> taskPage = page(Integer.parseInt(page));
+        Page<Task> taskPage = taskServiceImp.taskGetByPage(Integer.parseInt(page));
         if (taskPage.getContent().isEmpty()) {
-            taskPage = page(Integer.parseInt(page) - 1);
+            taskPage = taskServiceImp.taskGetByPage(Integer.parseInt(page) - 1);
         }
-        List<Task> tasks = taskIndex(taskPage.getContent());
+        List<Task> tasks = taskServiceImp.taskIndex(taskPage.getContent());
         return ResponseEntity.status(HttpStatus.OK).body(tasks);
     }
 
